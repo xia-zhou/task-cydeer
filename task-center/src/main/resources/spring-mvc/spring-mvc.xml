@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	">
+    <context:component-scan base-package="com.cydeer.task.web"/>
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+          p:defaultEncoding="UTF-8"></bean>
+    <!-- 启用spring mvc 注解 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <constructor-arg>
+                    <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+                        <!-- 字段为null时不显示 -->
+                        <property name="serializationInclusion">
+                            <value>NON_NULL</value>
+                        </property>
+                        <property name="featuresToDisable">
+                            <bean class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+                                <!-- Map中值为null的键值对不显示 -->
+                                <property name="staticField"
+                                          value="com.fasterxml.jackson.databind.SerializationFeature.WRITE_NULL_MAP_VALUES"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!-- 对静态资源的缓存处理 -->
+    <mvc:resources mapping="/RES/**" location="/RES/"/>
+    <!-- ViewResolver配置 -->
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/jsp/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+    <bean id="ajaxExceptionHandler" class="com.cydeer.task.exception.AjaxExceptionHandler"/>
+    <!-- 全局异常处理类 -->
+    <bean id="globalExceptionHandler" p:errorPage="errors/exception"
+          class="com.cydeer.task.exception.GlobalExceptionHandler">
+    </bean>
+    <!-- 全局异常处理 -->
+    <bean id="exceptionResolver" p:defaultStatusCode="503"
+          class="com.cydeer.task.exception.HandlerMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <!-- 遇到AjaxException异常时，采用 ajaxExceptionHandler 处理 -->
+                <prop key="com.cydeer.task.result.AjaxException">handler:ajaxExceptionHandler</prop>
+            </props>
+        </property>
+        <!-- 全局异常：在exceptionMappings里面找不到对应的异常时，采用 globalExceptionHandler 处理 -->
+        <property name="defaultErrorView" value="handler:globalExceptionHandler"/>
+        <!-- 定义在发生异常时视图跟返回码的对应关系 -->
+        <property name="statusCodes">
+            <props>
+                <!-- 发生AjaxException时对应视图handler:ajaxExceptionHandler，返回状态码200 -->
+                <prop key="handler:ajaxExceptionHandler">200</prop>
+            </props>
+        </property>
+    </bean>
+</beans>

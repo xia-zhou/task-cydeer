@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 对包中的所有类进行扫描类上的注解，以完成Bean创建和自动依赖注入的功能 需要更改 -->
+    <context:component-scan base-package="com.cydeer.task.core"/>
+    <aop:aspectj-autoproxy/>
+    <bean id="containerConfProperty"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <!-- 是否忽略不可解析的 -->
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <!-- 多个locations， 单个location <value> -->
+        <property name="locations">
+            <list>
+                <value>classpath*:/conf/*.conf</value>
+            </list>
+        </property>
+    </bean>
+
+
+</beans>
