@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * Created by zhangsong on 2016/10/13.
+ * 有xml配置到spring 容器中
  */
 public class TaskCenterApplicationListener
 		implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
@@ -37,6 +38,7 @@ public class TaskCenterApplicationListener
 			return;
 		}
 		try {
+			// 启动任务调度执行器
 			taskSchedulerService.startSchedule();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
@@ -52,6 +54,7 @@ public class TaskCenterApplicationListener
 		for (TaskInfo taskInfo : taskInfos) {
 			// TODO: 2016/10/13 判断定时任务的状态 准备就绪，或者正在运行中的都启动
 			try {
+				// 添加任务到任务调度执行器中
 				taskSchedulerService.scheduleTask(taskInfo.getId());
 			} catch (SchedulerException e) {
 				e.printStackTrace();

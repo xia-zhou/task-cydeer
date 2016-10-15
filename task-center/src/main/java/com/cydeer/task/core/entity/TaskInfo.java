@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * Created by zhangsong on 2016/10/13.
- * 定时任务信息
+ * 定时任务信息 存储在数据库
  */
 public class TaskInfo implements Serializable {
 	/**

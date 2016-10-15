@@ -9,6 +9,8 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * Created by zhangsong on 2016/10/13.
+ *任务调度执行器最终触发执行的job对象，触发之后回调用该job的execute方法。
+ *
  */
 public class TaskQuartzJob implements Job {
 

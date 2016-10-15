@@ -7,6 +7,7 @@
  */
 package com.cydeer.task.jackson;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -14,9 +15,12 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -168,6 +172,35 @@ public class Jackson {
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
 		}
+	}
+
+	@SuppressWarnings("deprecation")
+	@JsonFilter(DynamicFieldFilterProvider.DYNAMIC_FIELD_FILTER)
+	static class DynamicFieldFilterProvider extends FilterProvider {
+		public static final String DYNAMIC_FIELD_FILTER = "dynamicField";
+		private FilterProvider filterProvider;
+		private PropertyFilter runtimeFilter;
+
+		DynamicFieldFilterProvider(FilterProvider filterProvider, PropertyFilter runtimeFilter) {
+			this.filterProvider = filterProvider;
+			this.runtimeFilter = runtimeFilter;
+		}
+
+		@Deprecated
+		@Override
+		public BeanPropertyFilter findFilter(Object filterId) {
+			throw new UnsupportedOperationException("Access to deprecated filters not supported");
+		}
+
+		@Override
+		public PropertyFilter findPropertyFilter(Object filterId, Object valueToFilter) {
+			if (StringUtils.equals(DYNAMIC_FIELD_FILTER, filterId.toString()))
+				return this.runtimeFilter;
+			if (this.filterProvider != null)
+				return super.findPropertyFilter(filterId, valueToFilter);
+			return null;
+		}
+
 	}
 
 }

@@ -37,11 +37,21 @@ public class TaskSchedulerServiceImpl implements TaskSchedulerService {
 
 	}
 
+	/**
+	 * @param taskId         定时任务唯一标识
+	 * @param cronExpression quartz表达式
+	 * @return 触发器（quartz表达式的触发时间）
+	 */
 	private Trigger createTrigger(Integer taskId, String cronExpression) {
 		return TriggerBuilder.newTrigger().withIdentity(String.valueOf(taskId))
 		                     .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)).build();
 	}
 
+	/**
+	 *
+	 * @param taskId 定时任务唯一标识
+	 * @return 具体的job对象，当触发时，调用指定job的execute方法。
+	 */
 	private JobDetail createJobDetail(Integer taskId) {
 		return JobBuilder.newJob(TaskQuartzJob.class).withIdentity(String.valueOf(taskId)).build();
 	}
